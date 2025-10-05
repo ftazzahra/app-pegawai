@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>@yield('title', 'App Pegawai')</title>
+    <title>@yield('title', 'App Pegawai 2')</title>
 </head>
 <body>
     <header>
