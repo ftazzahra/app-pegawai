@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Employee;
+use App\Models\Department;
+use App\Models\Positions;
 
 class EmployeeController extends Controller
 {
@@ -12,8 +14,10 @@ class EmployeeController extends Controller
      */
     public function index()
     {
-        $employees = Employee::latest()->paginate(5);
-        return view('employees.index', compact('employees'));
+        $employees = Employee::with(['departments', 'positions'])->latest()->paginate(5);
+        $departments = Department::all(); 
+        $positions = Positions::all();   
+        return view('employees.index', compact('employees', 'departments', 'positions'));
     }
 
     /**
@@ -21,7 +25,9 @@ class EmployeeController extends Controller
      */
     public function create()
     {
-        return view('employees.create');
+        $departments = Department::all(); 
+        $positions = Positions::all();   
+        return view('employees.create', compact('departments', 'positions'));
     }
 
     /**
@@ -36,6 +42,8 @@ class EmployeeController extends Controller
         'tanggal_lahir' => 'required|date',
         'alamat' => 'required|string|max:255',
         'tanggal_masuk' => 'required|date',
+        'departemen_id' => 'required|exists:departments,id',
+        'jabatan_id' => 'required|exists:positions,id',
         'status' => 'required|string|max:50',
         ]);
         Employee::create($request->all());
@@ -56,13 +64,13 @@ class EmployeeController extends Controller
      */
     public function edit(string $id)
     {
-        $employee = Employee::find($id);
-        return view('employees.edit',compact('employee'));
+        $employee = Employee::findOrFail($id);
+        $departments = Department::all();
+        $positions = Positions::all();
+
+        return view('employees.edit', compact('employee', 'departments', 'positions'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         $request->validate([
@@ -72,19 +80,13 @@ class EmployeeController extends Controller
             'tanggal_lahir' => 'required|date',
             'alamat' => 'required|string|max:255',
             'tanggal_masuk' => 'required|date',
+            'departemen_id' => 'required|exists:departments,id',
+            'jabatan_id' => 'required|exists:positions,id',
             'status' => 'required|string|max:50',
         ]);
 
         $employee = Employee::findOrFail($id);
-        $employee->update($request->only([
-            'nama_lengkap',
-            'email',
-            'nomor_telepon',
-            'tanggal_lahir',
-            'alamat',
-            'tanggal_masuk',
-            'status',
-        ]));
+        $employee->update($request->all());
 
         return redirect()->route('employees.index');
     }

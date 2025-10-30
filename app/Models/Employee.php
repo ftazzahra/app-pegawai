@@ -13,6 +13,19 @@ class Employee extends Model
         'tanggal_lahir', 
         'alamat', 
         'tanggal_masuk', 
+        'departemen_id', 
+        'jabatan_id',
         'status', 
     ];
+
+    public function departments()
+    {
+        return $this->belongsTo(Department::class, 'departemen_id');
+    }
+
+    public function positions()
+    {
+        return $this->belongsTo(Positions::class, 'jabatan_id');
+    }
 }
+
